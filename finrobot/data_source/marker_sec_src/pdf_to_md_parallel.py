@@ -4,36 +4,60 @@ os.environ["IN_STREAMLIT"] = "true"  # Avoid multiprocessing inside surya
 os.environ["PDFTEXT_CPU_WORKERS"] = "1"  # Avoid multiprocessing inside pdftext
 SAVE_DIR = "output/SEC_EDGAR_FILINGS_MD"
 
-import pypdfium2  # Needs to be at the top to avoid warnings
-from typing import Optional
-import torch.multiprocessing as mp
-from tqdm import tqdm
-import math
+# Define marker availability flag
+MARKER_AVAILABLE = True
 
-from marker.convert import convert_single_pdf
-from marker.output import markdown_exists, save_markdown
-from marker.pdf.utils import find_filetype
-from marker.pdf.extract_text import get_length_of_text
-from marker.models import load_all_models
-from marker.settings import settings
-from marker.logger import configure_logging
-import traceback
-import json
+try:
+    import pypdfium2  # Needs to be at the top to avoid warnings
+    from typing import Optional
+    import torch.multiprocessing as mp
+    from tqdm import tqdm
+    import math
 
-configure_logging()
-SAVE_DIR = "output/SEC_EDGAR_FILINGS_MD"
+    from marker.convert import convert_single_pdf
+    from marker.output import markdown_exists, save_markdown
+    from marker.pdf.utils import find_filetype
+    from marker.pdf.extract_text import get_length_of_text
+    from marker.models import load_all_models
+    from marker.settings import settings
+    from marker.logger import configure_logging
+    import traceback
+    import json
+
+    configure_logging()
+except ImportError as e:
+    print(f"Warning: Import error with marker modules: {e}")
+    print("PDF to Markdown conversion will not be available")
+    MARKER_AVAILABLE = False
+    # Import common modules for defining dummy functions
+    from typing import Optional
+    import os
+    import traceback
+    import json
+
 
 def worker_init(shared_model):
+    if not MARKER_AVAILABLE:
+        print("Marker not available - worker initialization skipped")
+        return
+    
     global model_refs
     model_refs = shared_model
 
 
 def worker_exit():
+    if not MARKER_AVAILABLE:
+        return
+    
     global model_refs
     del model_refs
 
 
 def process_single_pdf(args):
+    if not MARKER_AVAILABLE:
+        print("Marker not available - process_single_pdf skipped")
+        return
+    
     filepath, out_folder, metadata, min_length = args
 
     fname = os.path.basename(filepath)
@@ -99,6 +123,11 @@ def run_marker_mp(
     - min_length: int, optional
         Minimum length of PDF to convert. Default is None.
     """
+    if not MARKER_AVAILABLE:
+        print("Error: marker package not installed. PDF to Markdown conversion not available.")
+        print("Please install marker using: pip install git+https://github.com/VikParuchuri/marker.git")
+        print("And surya using: pip install git+https://github.com/VikParuchuri/surya.git")
+        return
 
     in_folder = os.path.abspath(in_folder)
     out_folder = os.path.abspath(out_folder)

@@ -10,6 +10,7 @@ from autogen import (
     GroupChatManager,
     register_function,
 )
+from autogen.agentchat.contrib.compressible_agent import CompressibleAgent
 from collections import defaultdict
 from functools import partial
 from abc import ABC, abstractmethod
@@ -19,7 +20,7 @@ from .utils import *
 from .prompts import leader_system_message, role_system_message
 
 
-class FinRobot(AssistantAgent):
+class FinRobot(CompressibleAgent):
 
     def __init__(
         self,
@@ -151,7 +152,7 @@ class SingleAssistant(SingleAssistantBase):
 
     def chat(self, message: str, use_cache=False, **kwargs):
         with Cache.disk() as cache:
-            self.user_proxy.initiate_chat(
+            chat_result = self.user_proxy.initiate_chat(
                 self.assistant,
                 message=message,
                 cache=cache if use_cache else None,
@@ -160,6 +161,8 @@ class SingleAssistant(SingleAssistantBase):
 
         print("Current chat finished. Resetting agents ...")
         self.reset()
+        
+        return chat_result
 
     def reset(self):
         self.user_proxy.reset()
@@ -222,8 +225,12 @@ class SingleAssistantShadow(SingleAssistant):
             "work_dir": "coding",
             "use_docker": False,
         },
+        # custom_model_client=None,
         **kwargs,
     ):
+        # if custom_model_client:
+        #     llm_config["model"] = custom_model_client
+
         super().__init__(
             agent_config,
             llm_config=llm_config,

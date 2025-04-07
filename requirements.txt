@@ -41,3 +41,15 @@ tenacity==8.3.0
 tqdm==4.66.1
 typing_extensions==4.9.0
 unstructured==0.8.1
+
+# New requirements from the code block
+fastapi
+uvicorn[standard]
+finrobot
+openai>=1.0.0
+chromadb
+pypdf
+sentence-transformers
+tiktoken
+python-dotenv
+

@@ -15,3 +15,14 @@ projects/
 dist/
 tmp/
 filings/
+./tutorials_beginner/.cache
+./tutorials_beginner/sec-filling-db
+./tutorials_beginner/earning-call-db
+./tutorials_beginner/finance_llm_data
+./tutorials_beginner/output
+./.cache
+./earnings-call-db
+./earnings-call-db/
+./output
+OAI_CONFIG_LIST
+config_api_keys

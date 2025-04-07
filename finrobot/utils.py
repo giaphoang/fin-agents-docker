@@ -27,6 +27,9 @@ def save_output(data: pd.DataFrame, tag: str, save_path: SavePathType = None) ->
 def get_current_date():
     return date.today().strftime("%Y-%m-%d")
 
+def get_date_n_days_ago(n: int):
+    return (date.today() - timedelta(days=n)).strftime("%Y-%m-%d")
+
 
 def register_keys_from_json(file_path):
     with open(file_path, "r") as f:
