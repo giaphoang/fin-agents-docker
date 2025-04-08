@@ -114,3 +114,10 @@ The Docker setup includes persistent volumes for the vector databases:
 - Still have conflict in building docker process
 - install too many requiremnts.txt due to no exact dependencies cost a lot of time
 - still cannot expose api
+
+## ISSUE resolution
+In the running docker process if you found this bug: 
+
+ ImportError: /home/zap/miniconda3/lib/python3.12/site-packages/sklearn/utils/../../scikit_learn.libs/libgomp-d22c30c5.so.1.0.0: cannot allocate memory in static TLS block
+
+ you can just copy that path expose via ENV LD_PRELOAD (follow this link for more detail https://github.com/keras-team/keras-tuner/issues/317#issuecomment-1190283255)
