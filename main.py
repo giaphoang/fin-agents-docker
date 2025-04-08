@@ -56,7 +56,7 @@ try:
 
     # Manually filter for the desired model
     filtered_configs = [config for config in all_configs if config.get("model") == "gpt-3.5-turbo"]
-    logger.info(f"Loaded and filtered configs: {filtered_configs}") # Log the filtered list
+    logger.info(f"Loaded and filtered configs") # Log the filtered list {filtered_configs}
 
     if not filtered_configs:
         raise ValueError(f"No valid configurations found for the model 'gpt-3.5-turbo' in {CONFIG_FILE_PATH}")

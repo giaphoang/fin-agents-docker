@@ -1,0 +1,27 @@
+# Ignore specific notebook
+tutorials_beginner/agent_annual_report.ipynb
+tutorials_advanced/agent_annual_report.ipynb
+
+# Optionally, ignore all notebooks
+# *.ipynb
+
+# Common files to ignore
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+env/
+venv/
+ENV/
+.ipynb_checkpoints
+.DS_Store
+
+# Large directories that might not be needed
+.git
+.cache
+./earnings-call-db
+./output
+./sec-filings-db

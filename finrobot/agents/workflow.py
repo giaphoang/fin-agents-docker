@@ -10,7 +10,7 @@ from autogen import (
     GroupChatManager,
     register_function,
 )
-from autogen.agentchat.contrib.compressible_agent import CompressibleAgent
+# from autogen.agentchat.contrib.compressible_agent import CompressibleAgent
 from collections import defaultdict
 from functools import partial
 from abc import ABC, abstractmethod
@@ -20,7 +20,7 @@ from .utils import *
 from .prompts import leader_system_message, role_system_message
 
 
-class FinRobot(CompressibleAgent):
+class FinRobot(AssistantAgent):
 
     def __init__(
         self,

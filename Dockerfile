@@ -6,14 +6,20 @@ LABEL author="Zap"
 SHELL ["/bin/bash", "--login", "-c"]
 
 # Create a non-root user
+# Build arguments
 ARG username=zapfinrobot
 ARG uid=1204
 ARG gid=124
-# Set image name and tag for the container
 ARG IMAGE_NAME=finrobot
 ARG IMAGE_TAG=latest
 
-ENV USER=$username UID=$uid GID=$gid HOME=/home/$USER IMAGE_NAME=$IMAGE_NAME IMAGE_TAG=$IMAGE_TAG
+# Set environment variables (using key=value syntax and braces)
+ENV USER=${username} \
+    UID=${uid} \
+    GID=${gid} \
+    HOME=/home/${username} \
+    IMAGE_NAME=${IMAGE_NAME} \
+    IMAGE_TAG=${IMAGE_TAG}
 
 RUN adduser --disabled-password\
     --gecos "Zap Fin Robot user"\
@@ -27,13 +33,34 @@ COPY my_conda.yml /tmp/
 COPY requirements.txt /tmp/
 RUN chown $USER:$GID /tmp/my_conda.yml /tmp/requirements.txt
 
+# Install wget and build tools (including gcc, g++, and python3-dev)
+RUN apt-get update && apt-get install -y \
+    wget \
+    build-essential \
+    python3-dev \
+    && ln -s /usr/bin/md5sum /usr/bin/md5
+
 # Switch to non-root user
 USER $USER
 
-#Install Miniconda
-ENV URL_PREFIX=https://repo.anaconda.com/miniconda \
-    INSTALLER_URL=$URL_PREFIX/Miniconda3-latest-Linux-x86_64.sh \
-    CONDA_DIR=~/miniconda3
+#ARG for install Miniconda
+ARG URL_PREFIX=https://repo.anaconda.com/miniconda
+ARG INSTALLER_URL=$URL_PREFIX/Miniconda3-latest-Linux-aarch64.sh
+ARG CONDA_DIR=$HOME/miniconda3
+
+# Before building the conda environment, remove build strings from my_conda.yml.
+# This regex removes any "=<something>_<something>" pattern from each dependency.
+RUN sed -E -i 's/(=[^=]+_[^ ]+)//g' /tmp/my_conda.yml && \
+    sed -i '/^ *- *libcxx(=.*)?/d' /tmp/my_conda.yml && \
+    sed -E -i '/^[[:space:]]*- *appnope(=.*)?/d' /tmp/my_conda.yml
+
+# Remove macOS-specific dependencies (like libcxx) from the environment file
+RUN sed -E -i '/^[[:space:]]*- *libcxx(=.*)?/d' /tmp/my_conda.yml
+
+#Install and build Miniconda
+ENV URL_PREFIX=${URL_PREFIX} \
+    INSTALLER_URL=${INSTALLER_URL} \
+    CONDA_DIR=${CONDA_DIR}
 
 RUN wget --quiet $INSTALLER_URL -O ~/miniconda.sh && \
     chmod u+x ~/miniconda.sh && \
@@ -50,9 +77,14 @@ RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
 RUN conda init bash
 
 # Create a project directory inside user home
-ENV PROJECT_DIR ~/finrobot_app
-RUN mkdir $PROJECT_DIR
+ENV PROJECT_DIR=$HOME/finrobot_app
+RUN mkdir -p $PROJECT_DIR
 WORKDIR $PROJECT_DIR
+
+# Copy your ASGI application file into the project directory.
+# Make sure main_up.py exists in your build context.
+COPY main_up.py $PROJECT_DIR/
+
 
 # build the conda environment
 ENV ENV_PREFIX $PROJECT_DIR/env
@@ -82,5 +114,6 @@ ENV DISABLE_TENSORFLOW_LOGS=1
 
 # Activate conda environment and run the application
 SHELL ["/bin/bash", "--login", "-c"]
-CMD ["conda", "run", "-p", "$ENV_PREFIX", "uvicorn", "main_up:app", "--host", "0.0.0.0", "--port", "8888"]
+CMD ["uvicorn", "main_up:app", "--host", "0.0.0.0", "--port", "8888"]
+
  
