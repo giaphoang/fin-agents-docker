@@ -21,17 +21,17 @@ Before building and running the Docker container, ensure you have:
 ## Building and Running
 
 ```bash
-# Build docker (need to modify $IMAGE_NAME and $IMAGE_TAG)
+# Build docker (need to modify $IMAGE_NAME:$IMAGE_TAG for example finagents:latest)
 docker image build \
   --build-arg username=$USER \
   --build-arg uid=$UID \
   --build-arg gid=$GID \
   --file Dockerfile \
-  --tag $IMAGE_NAME:$IMAGE_TAG \
+  --tag finagents:latest \
   ./
 
-# Run container expose api (with coressponding $IMAGE_NAME and $IMAGE_TAG)
-docker run -p 8888:8888 $IMAGE_NAME:$IMAGE_TAG
+# Run container expose api (with coressponding $IMAGE_NAME:$IMAGE_TAG for example finagents:latest)
+docker run -p 8888:8888 finagentsapi:latest                       
 
 # View logs
 docker-compose logs -f

@@ -227,7 +227,7 @@ dependencies:
       - rsa==4.9
       - ruamel-yaml==0.17.17
       - safetensors==0.5.3
-      - scikit-learn==1.5.0
+      - scikit_learn==1.5.0
       - scipy==1.15.2
       - sec-api==1.0.31
       - sentence-transformers==4.0.1

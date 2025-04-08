@@ -38,10 +38,14 @@ RUN apt-get update && apt-get install -y \
     wget \
     build-essential \
     python3-dev \
+    libgomp1 \
     && ln -s /usr/bin/md5sum /usr/bin/md5
 
 # Switch to non-root user
 USER $USER
+
+# libgomp.so.1 issue in aarch64
+ENV LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
 
 #ARG for install Miniconda
 ARG URL_PREFIX=https://repo.anaconda.com/miniconda
@@ -84,6 +88,10 @@ WORKDIR $PROJECT_DIR
 # Copy your ASGI application file into the project directory.
 # Make sure main_up.py exists in your build context.
 COPY main_up.py $PROJECT_DIR/
+COPY finrobot              $PROJECT_DIR/finrobot
+COPY report                $PROJECT_DIR/report
+COPY config_api_keys       $PROJECT_DIR/config_api_keys
+COPY OAI_CONFIG_LIST       $PROJECT_DIR/OAI_CONFIG_LIST
 
 
 # build the conda environment
