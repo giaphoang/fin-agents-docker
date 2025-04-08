@@ -1,0 +1,9 @@
+
+{
+    "FINNHUB_API_KEY": "<your-finnhub-api-key>",
+    "FMP_API_KEY": "<your-fmp-api-key>",
+    "SEC_API_KEY": "<your-sec-api-key>",
+    "REDDIT_CLIENT_ID": "<your-reddit-client-id>",
+    "REDDIT_CLIENT_SECRET": "<your-reddit-client-secret>",
+    "TWITTER_BEARER_TOKEN": "<your-twitter-bearer-token>"
+}

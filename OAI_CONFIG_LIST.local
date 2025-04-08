@@ -1,0 +1,38 @@
+[
+    {
+        "model": "gpt-3.5-turbo",
+        "api_key": "<your-openai-api-key>"
+    },
+    {
+        "model": "gpt-4-1106-vision-preview",
+        "api_key": "<your-openai-api-key>"
+    },
+    {
+        "model": "<your Azure OpenAI deployment name>",
+        "api_key": "<your Azure OpenAI API key here>",
+        "base_url": "<your Azure OpenAI API base here>",
+        "api_type": "azure",
+        "api_version": "2024-02-15-preview"
+    },
+    {
+        "model": "<your Azure OpenAI deployment name>",
+        "api_key": "<your Azure OpenAI API key here>",
+        "base_url": "<your Azure OpenAI API base here>",
+        "api_type": "azure",
+        "api_version": "2024-02-15-preview"
+    },
+    {
+        "model": "gpt-4-0125-preview",
+        "api_key": "<your-openai-api-key>"
+    },
+    {
+        "model": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+        "api_key": "<your-together-api-key>",
+        "api_type": "together"
+    },
+    {
+        "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+        "api_key": "<your-together-api-key>",
+        "api_type": "together"
+    }
+]

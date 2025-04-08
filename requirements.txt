@@ -12,7 +12,7 @@ sec_api
 
 # data handling
 numpy
-pandas
+pandas>=0.8.0
 pyPDF2
 reportlab
 pyautogen[retrievechat]
@@ -24,10 +24,10 @@ wheel>=0.33.6
 # historical data
 praw
 tushare
-pandas_datareader
+pandas_datareader>=0.8.0
 
 pdfkit==1.0.0
-marker-pdf
+marker-pdf==0.2.13
 pandas==2.0.3
 langchain==0.1.20
 nltk==3.8.1
