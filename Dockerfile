@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:24.10
 LABEL author="Zap"
 
 # Use SHELL to change default shell to bash for COnda
@@ -21,6 +21,14 @@ ENV USER=${username} \
     IMAGE_NAME=${IMAGE_NAME} \
     IMAGE_TAG=${IMAGE_TAG}
 
+# Install wget and build tools (including gcc, g++, and python3-dev)
+RUN apt-get update && apt-get install -y \
+    wget \
+    build-essential \
+    python3-dev \
+    adduser \
+    && ln -s /usr/bin/md5sum /usr/bin/md5
+
 RUN adduser --disabled-password\
     --gecos "Zap Fin Robot user"\
     --uid $UID\
@@ -33,16 +41,8 @@ COPY my_conda.yml /tmp/
 COPY requirements.txt /tmp/
 RUN chown $USER:$GID /tmp/my_conda.yml /tmp/requirements.txt
 
-# Install wget and build tools (including gcc, g++, and python3-dev)
-RUN apt-get update && apt-get install -y \
-    wget \
-    build-essential \
-    python3-dev \
-    libgomp1 \
-    && ln -s /usr/bin/md5sum /usr/bin/md5
-
 # libgomp.so.1 issue in aarch64
-ENV LD_PRELOAD=/home/zap/miniconda3/lib/python3.12/site-packages/sklearn/utils/../../scikit_learn.libs/libgomp-d22c30c5.so.1.0.0
+ENV LD_PRELOAD="/home/zap/miniconda3/lib/python3.12/site-packages/sklearn/utils/../../scikit_learn.libs/libgomp-d22c30c5.so.1.0.0  /home/zap/miniconda3/lib/python3.12/site-packages/hnswlib.cpython-312-aarch64-linux-gnu.so"
 
 # Switch to non-root user
 USER $USER
@@ -97,7 +97,7 @@ COPY OAI_CONFIG_LIST $PROJECT_DIR/OAI_CONFIG_LIST
 # build the conda environment
 ENV ENV_PREFIX $PROJECT_DIR/env
 RUN conda update -n base -c defaults conda && \
-    conda env create -p $ENV_PREFIX -f /tmp/my_conda.yml && \
+    conda env create -p $ENV_PREFIX -f /tmp/my_conda.yml python=3.10.16 && \
     conda clean --all --yes
 
 # install any JupyterLab extensions (optional!)
@@ -110,6 +110,10 @@ RUN pip install -r /tmp/requirements.txt
 
 # # Create directories for vector databases
 # RUN mkdir -p $PROJECT_DIR/earnings-call-db $PROJECT_DIR/sec-filings-db $PROJECT_DIR/sec-filings-md-db $PROJECT_DIR/report
+
+# install some packages in case cannot import (rag_up)
+# RUN pip install sentence-transformers -q
+# RUN pip install langchain-chroma -U -q
 
 
 # Expose the API port
