@@ -4,11 +4,13 @@ import logging
 import traceback
 from typing import Optional, List, Dict, Any, Union
 from pydantic import BaseModel, Field
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File
 import autogen
 import uvicorn
 from datetime import datetime
 import yfinance as yf
+import shutil
+from pathlib import Path
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -131,10 +133,16 @@ class RagQueryAdvancedRequest(BaseModel):
     form_type: Optional[str] = Field(None, description="SEC form type (e.g., '10-K', '10-Q')")
     quarter: Optional[str] = Field(None, description="Quarter for earnings call (e.g., 'Q1', 'Q2')")
 
+class UploadRequest(BaseModel):
+    report_type: str = Field(..., description="Type of report being uploaded ('annual_report' or '10k')")
+    company: str = Field(..., description="Company name or ticker symbol")
+    year: str = Field(..., description="Year of the report")
+
 # --- API Endpoints ---
 @app.get("/")
 async def root():
     return {"message": "FinRobot API is running", "endpoints": [
+        "/upload_pdf",
         "/chat_rag", 
         "/forecast",
         "/stock_chart",
@@ -443,6 +451,64 @@ async def rag_advanced_endpoint(request: RagQueryAdvancedRequest):
     except Exception as e:
         logger.error(f"Error in advanced RAG: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
+@app.post("/upload_pdf")
+async def upload_pdf_endpoint(
+    file: UploadFile = File(...),
+    report_type: str = Query(..., description="Type of report ('annual_report' or '10k')"),
+    company: str = Query(..., description="Company name or ticker symbol"),
+    year: str = Query(..., description="Year of the report")
+):
+    """
+    Upload a PDF file for use with the chat_rag endpoint.
+    The file will be saved and made available for RAG operations.
+    """
+    logger.info(f"Received PDF upload request for {company} {year} {report_type}")
+    
+    # Validate report type
+    if report_type not in ["annual_report", "10k"]:
+        raise HTTPException(status_code=400, detail="Invalid report_type. Must be 'annual_report' or '10k'")
+    
+    # Create directory if it doesn't exist
+    report_dir = Path(REPORT_DIR)
+    report_dir.mkdir(exist_ok=True)
+    
+    # Generate filename based on metadata
+    filename = f"{company}_{report_type}_{year}.pdf"
+    file_path = report_dir / filename
+    
+    try:
+        # Save the uploaded file
+        with file_path.open("wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        # Update the RETRIEVE_CONFIGS with the new file
+        RETRIEVE_CONFIGS[report_type] = {
+            "task": "qa",
+            "vector_db": None,
+            "docs_path": [str(file_path)],
+            "chunk_token_size": 2000 if report_type == "10k" else 1000,
+            "collection_name": f"{company.lower()}_{report_type}_{year}",
+            "get_or_create": True,
+            "must_break_at_empty_line": False,
+            "embedding_model": "all-MiniLM-L6-v2",
+            "embedding_function": embedding_function,
+        }
+        
+        return {
+            "message": "File uploaded successfully",
+            "filename": filename,
+            "company": company,
+            "year": year,
+            "report_type": report_type,
+            "file_path": str(file_path)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error uploading file: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
+    finally:
+        file.file.close()
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
