@@ -26,3 +26,4 @@ filings/
 ./output
 OAI_CONFIG_LIST
 config_api_keys
+.env

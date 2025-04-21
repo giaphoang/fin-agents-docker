@@ -85,14 +85,6 @@ ENV PROJECT_DIR=$HOME/finrobot_app
 RUN mkdir -p $PROJECT_DIR
 WORKDIR $PROJECT_DIR
 
-# Copy your ASGI application file into the project directory.
-# Make sure main_up.py exists in your build context.
-COPY main_up.py $PROJECT_DIR/
-COPY finrobot $PROJECT_DIR/finrobot
-COPY report $PROJECT_DIR/report
-COPY config_api_keys $PROJECT_DIR/config_api_keys
-COPY OAI_CONFIG_LIST $PROJECT_DIR/OAI_CONFIG_LIST
-
 
 # build the conda environment
 ENV ENV_PREFIX $PROJECT_DIR/env
@@ -115,9 +107,17 @@ RUN pip install -r /tmp/requirements.txt
 # RUN pip install sentence-transformers -q
 # RUN pip install langchain-chroma -U -q
 
+# Copy your ASGI application file into the project directory.
+# Make sure main_up.py exists in your build context.
+COPY main_up.py $PROJECT_DIR/
+COPY finrobot $PROJECT_DIR/finrobot
+COPY report $PROJECT_DIR/report
+COPY config_api_keys $PROJECT_DIR/config_api_keys
+COPY OAI_CONFIG_LIST $PROJECT_DIR/OAI_CONFIG_LIST
+
 
 # Expose the API port
-EXPOSE 8888
+EXPOSE 80
 
 # Environment variables to avoid TensorFlow warnings and configure behavior
 ENV PYTHONUNBUFFERED=1
@@ -126,6 +126,6 @@ ENV DISABLE_TENSORFLOW_LOGS=1
 
 # Activate conda environment and run the application
 SHELL ["/bin/bash", "--login", "-c"]
-CMD ["uvicorn", "main_up:app", "--host", "0.0.0.0", "--port", "8888"]
+CMD ["uvicorn", "main_up:app", "--host", "0.0.0.0", "--port", "80"]
 
  

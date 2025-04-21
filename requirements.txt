@@ -56,3 +56,8 @@ python-dotenv
 ag2[openai]
 langchain_chroma
 
+
+# Azure SDK
+azure-identity
+azure-mgmt-resource==15.0.0
+azure-mgmt-eventgrid==8.0.0b1
