@@ -42,14 +42,14 @@ COPY requirements.txt /tmp/
 RUN chown $USER:$GID /tmp/my_conda.yml /tmp/requirements.txt
 
 # libgomp.so.1 issue in aarch64
-ENV LD_PRELOAD="/home/zap/miniconda3/lib/python3.12/site-packages/sklearn/utils/../../scikit_learn.libs/libgomp-d22c30c5.so.1.0.0  /home/zap/miniconda3/lib/python3.12/site-packages/hnswlib.cpython-312-aarch64-linux-gnu.so"
+# ENV LD_PRELOAD="/home/zap/miniconda3/lib/python3.12/site-packages/sklearn/utils/../../scikit_learn.libs/libgomp-d22c30c5.so.1.0.0  /home/zap/miniconda3/lib/python3.12/site-packages/hnswlib.cpython-312-aarch64-linux-gnu.so"
 
 # Switch to non-root user
 USER $USER
 
 #ARG for install Miniconda
 ARG URL_PREFIX=https://repo.anaconda.com/miniconda
-ARG INSTALLER_URL=$URL_PREFIX/Miniconda3-latest-Linux-aarch64.sh
+ARG INSTALLER_URL=$URL_PREFIX/Miniconda3-latest-MacOSX-x86_64.sh
 ARG CONDA_DIR=$HOME/miniconda3
 
 # Before building the conda environment, remove build strings from my_conda.yml.
