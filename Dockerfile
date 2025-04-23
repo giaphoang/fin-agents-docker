@@ -49,7 +49,7 @@ USER $USER
 
 #ARG for install Miniconda
 ARG URL_PREFIX=https://repo.anaconda.com/miniconda
-ARG INSTALLER_URL=$URL_PREFIX/Miniconda3-latest-MacOSX-x86_64.sh
+ARG INSTALLER_URL=$URL_PREFIX/Miniconda3-latest-Linux-x86_64.sh
 ARG CONDA_DIR=$HOME/miniconda3
 
 # Before building the conda environment, remove build strings from my_conda.yml.
