@@ -29,7 +29,8 @@ RUN apt-get update && apt-get install -y \
     adduser \
     && ln -s /usr/bin/md5sum /usr/bin/md5
 
-RUN adduser --disabled-password\
+RUN  groupadd --gid $GID $USER \
+    && adduser --disabled-password\
     --gecos "Zap Fin Robot user"\
     --uid $UID\
     --gid $GID\
